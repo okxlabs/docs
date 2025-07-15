@@ -60,7 +60,7 @@ We welcome contributions! Please follow these steps:
 2. Add new documentation under the correct folder:
    - `overview.md` for product overviews
    - `guides.md` for step-by-step guides
-   - `technical-reference.md` for API and contract references
+   - `technical-reference.md` for contract references
 3. Add example contracts in the `examples/` directory.
 4. Open a Pull Request with a clear description of your changes.
 
