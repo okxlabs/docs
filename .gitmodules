@@ -1,0 +1,3 @@
+[submodule "examples/DEX-Router-EVM-V1/lib/openzeppelin-contracts"]
+	path = examples/DEX-Router-EVM-V1/lib/openzeppelin-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts

@@ -1,0 +1,16 @@
+abi/
+artifacts
+cache
+node_modules
+.env
+.DS_Store
+.vscode
+.idea
+.vscode
+.vscode
+broadcast/
+lib/
+examples/DEX-Router-EVM-V1/lib
+examples/DEX-Router-EVM-V1/out
+examples/DEX-Router-EVM-V1/cache
+dist/
