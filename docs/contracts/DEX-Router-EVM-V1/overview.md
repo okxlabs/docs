@@ -25,12 +25,12 @@ The DEX-Router-EVM follows a modular architecture designed for extensibility and
 ### Core Router Contract
 - **DexRouter.sol**: The main entry point contract that orchestrates all swap operations
 - **Version**: v1.0.4-toB-commission
-- **Features**: Smart routing, batch execution, commission handling, multi-protocol support
+- **Features**: Smart routing, batch execution, enhanced error handling, robust commission processing, multi-protocol support
 
 ### ExactOut Router System
 - **DexRouterExactOut.sol**: Specialized router for exact output swaps
-- **Version**: v1.0.1
-- **Features**: Exact output swap execution, commission handling, multi-protocol support
+- **Version**: v1.0.4-toB-commission
+- **Features**: Exact output swap execution, enhanced commission handling, improved error management, multi-protocol support
 
 ### Base Router Components
 - **UnxswapRouter**: Handles Uniswap V2-style swaps with optimized routing
@@ -38,7 +38,7 @@ The DEX-Router-EVM follows a modular architecture designed for extensibility and
 - **UnxswapExactOutRouter**: Handles Uniswap V2-style exact output swaps
 - **UnxswapV3ExactOutRouter**: Specialized for Uniswap V3 exact output swaps
 - **WrapETHSwap**: Manages ETH/WETH wrapping and unwrapping operations
-- **CommissionLib**: Implements commission fee collection and distribution
+- **CommissionLib**: Implements robust commission fee collection and distribution with enhanced referrer support
 
 ### Adapter Ecosystem
 The router supports **80+ DEX protocols** through dedicated adapter contracts:
@@ -75,6 +75,7 @@ The router supports **80+ DEX protocols** through dedicated adapter contracts:
 - **Batch processing**: Execute multiple swaps in a single transaction
 - **Optimal pricing**: Find the best rates across all available liquidity sources
 - **Slippage protection**: Configurable minimum return amounts
+- **Enhanced error handling**: Custom revert logic for better error reporting and debugging
 
 ### Swap Types
 
@@ -97,12 +98,14 @@ The router supports **80+ DEX protocols** through dedicated adapter contracts:
 - **Commission integration**: Dual-rate fee collection system with referral support
 
 ### Advanced Features
-- **Commission system**: Built-in referral and fee collection mechanism with dual-rate/bi-directional support
+- **Enhanced commission system**: Built-in referral and fee collection mechanism with dual-rate/bi-directional support and improved referrer handling
+- **Robust error handling**: Custom revert mechanisms with detailed error messages for better debugging and user experience
 - **Memo functionality**: Brings arbitrary data onchain for reference without execution 
 - **Pre-funded swaps**: Swaps using tokens already held in the router contract
 - **Native token handling**: Seamless ETH/WETH conversion
 - **Immutable design**: Decentralized operation without administrative controls
 - **Gas optimization**: Efficient batch execution and path optimization
+- **Improved code maintainability**: Enhanced variable naming conventions and cleaner error management
 
 ### Supported Swap Types
 1. **Multi-hop swaps**: Complex routing through multiple protocols
@@ -245,7 +248,9 @@ The router system is designed to work across multiple EVM-compatible networks:
 
 - **DeadLine checks**: All swaps must complete before specified deadLines
 - **Minimum return enforcement**: Slippage protection on all trades
+- **Enhanced error handling**: Custom revert logic provides detailed error messages instead of generic failures
 - **Immutable operations**: No administrative backdoors or privileged access
-- **Secure token handling**: Using OpenZeppelin's SafeERC20
+- **Secure token handling**: Using OpenZeppelin's SafeERC20 with improved error reporting
 - **Reentrancy protection**: Built-in protection against reentrancy attacks
+- **Robust commission processing**: Enhanced error management for commission transfers and referrer operations
 
