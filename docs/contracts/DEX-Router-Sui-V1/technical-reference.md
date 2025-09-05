@@ -1,20 +1,22 @@
-# DEX Router - Technical Reference
-
-**Auto-generated from Move code annotations and interface analysis**
+# DEX-Router-Sui Technical Reference
 
 ## Program Overview
 
-### Router Contract (`dexrouter`)
+The DEX-Router-Sui is a smart contract system that provides DEX aggregation and optimal routing capabilities on the Sui blockchain. This document provides complete technical specifications for all exported functions and data structures.
 
-- **Framework**: Sui Move Framework v1.48.2
-- **License**: Licensed under standard Move package licensing
-- **Purpose**: Production-grade DEX aggregation router for Sui blockchain with 14 protocol integrations
+> **📝 Contract-Generated Documentation**: This technical reference is generated from Move source code analysis and interface definitions. For the most up-to-date information, refer to the source contracts.
 
-### Extended Router Contract (`dexrouter_extended`)
+### Main Contracts
 
-- **Framework**: Sui Move Framework v1.48.2
-- **License**: Licensed under standard Move package licensing
-- **Purpose**: DeFi protocol integration router with 8+ experimental protocols
+#### Router Contract (`dexrouter`)
+- **Framework**: Sui Move v1.48.2
+- **Supported Protocols**: 10+ DEX integrations
+
+#### Extended Router Contract (`dexrouter_extended`)
+- **Framework**: Sui Move v1.48.2
+- **Supported Protocols**: 8 DEX integrations
+
+> **⚠️ Contract Address Updates**: These contract addresses may be updated in future versions.
 
 ## Core Data Structures
 
@@ -31,7 +33,7 @@ struct OrderRecord has copy, drop {
 
 **Purpose**: Track all swap transactions with unique identifiers for external analytics and monitoring systems.
 
-**Usage Context**: Emitted by all finalize functions to provide comprehensive transaction tracking.
+**Emission Context**: Emitted by all finalize functions to provide comprehensive transaction tracking.
 
 #### CommissionRecord
 ```move
@@ -43,7 +45,7 @@ struct CommissionRecord has copy, drop {
 
 **Purpose**: Monitor and audit commission distribution for referral and partner programs.
 
-**Usage Context**: Emitted when commission rate > 0 and valid referral address provided.
+**Emission Context**: Emitted when commission rate > 0 and valid referral address provided.
 
 #### HopRecord
 ```move
@@ -54,19 +56,13 @@ struct HopRecord has copy, drop {
 
 **Purpose**: Track individual swap steps within multi-hop routes for debugging and analytics.
 
-**Usage Context**: Emitted by each individual protocol swap function before finalization.
+**Emission Context**: Emitted by each individual protocol swap function before finalization.
 
 ### System Constants
 
-#### Commission Configuration
-```move
-const MAX_COMMISSION_RATE: u64 = 300;    // 3% maximum (300 basis points)
-const MAX_PERCENTAGE: u64 = 10000;       // 100% in basis points
-const PERCENTAGE_DIVISOR: u64 = 10000;   // Basis point calculation divisor
-```
-
 #### Error Codes
 ```move
+// Router Contract Error Codes
 const E_ROUTER_MIN_RETURN_NOT_REACH: u64 = 1;      // Slippage protection triggered
 const E_PERCENTAGE: u64 = 2;                       // Invalid percentage value
 const E_COMMISSION_PERCENTAGE: u64 = 3;            // Commission rate exceeds maximum
@@ -78,14 +74,66 @@ const E_MIN_AMOUNT_ZERO: u64 = 8;                  // Zero amount validation (ma
 const E_CETUS_MIN_RETURN_NOT_REACH: u64 = 9;       // Cetus protocol slippage protection
 const E_KRIYA_CLMM_INPUT_AMOUNT: u64 = 10;         // Kriya CLMM input validation
 
-// Extended Router Error Codes (different values)
+// Extended Router Error Codes
 const E_MIN_AMOUNT_ZERO: u64 = 6;                  // Zero amount validation (extended router)
 const E_SLIPPAGE_EXCEEDED: u64 = 7;                // Extended router slippage protection
 const E_INPUT_AMOUNT: u64 = 8;                     // Extended router input validation
 ```
 
+## Supported DEX Protocols
 
-## API Reference by Category
+### Router Contract Protocols (13 Total)
+
+#### Concentrated Liquidity Market Makers (CLMM)
+```move
+// Cetus CLMM - Advanced concentrated liquidity
+cetus_swap_a2b_with_return<CoinTypeA, CoinTypeB>    // A-to-B swap
+cetus_swap_b2a_with_return<CoinTypeA, CoinTypeB>    // B-to-A swap
+
+// Turbos CLMM - High-performance concentrated liquidity  
+turbos_swap_a_b_with_return<CoinTypeA, CoinTypeB, FeeType>  // A-to-B swap
+
+// Kriya CLMM - Dual protocol concentrated liquidity
+kriya_clmm_swap_token_x_with_return<T0, T1>        // Token X swap
+kriya_clmm_swap_token_y_with_return<T0, T1>        // Token Y swap
+
+// FlowX v3 - Next-generation CLMM
+flowxv3_swap_a2b_with_return<CoinTypeA, CoinTypeB> // A-to-B swap
+flowxv3_swap_b2a_with_return<CoinTypeA, CoinTypeB> // B-to-A swap
+```
+
+#### Automated Market Makers (AMM)
+```move
+// SuiSwap - Native Sui AMM
+suiswap_x_2_y_with_return<Ty0, Ty1>                // X-to-Y swap
+suiswap_y_2_x_with_return<Ty0, Ty1>                // Y-to-X swap
+
+// Kriya AMM - Traditional AMM
+kriya_amm_swap_token_x_with_return<T0, T1>         // Token X swap
+kriya_amm_swap_token_y_with_return<T0, T1>         // Token Y swap
+
+// FlowX v2 - Direct swap
+flowx_swap_exact_input_direct_with_return<CoinTypeA, CoinTypeB>
+
+// Aftermath - Advanced AMM with insurance
+aftermath_swap_exact_in_with_return<T0, T1, T2>
+```
+
+#### Order Book Systems
+```move
+// DeepBook V3 - Central limit order book
+deepbook_swap_base_to_quote_with_return<BaseAsset, QuoteAsset>
+deepbook_swap_quote_to_base_with_return<BaseAsset, QuoteAsset>
+```
+
+#### Liquid Staking Protocols
+```move
+// AFSUI - Aftermath Finance liquid staking
+afsui_swap_a2b_with_return                         // SUI → AFSUI staking
+afsui_swap_b2a_with_return                         // AFSUI → SUI unstaking
+```
+
+## Public Functions
 
 ### Core Router Functions
 
@@ -117,16 +165,12 @@ public fun finalize<CoinType>(
 
 **Returns**: None (transfers coins to appropriate recipients)
 
-
-
 **Access Control**: Public function, no restrictions
 
 **Error Conditions**:
 - `E_MIN_AMOUNT_ZERO`: Minimum amount must be greater than zero
 - `E_ROUTER_MIN_RETURN_NOT_REACH`: Output amount below minimum threshold
 - `E_INVALID_PARAMETER`: Commission rate without valid referral address
-
-
 
 ### Commission Management Functions
 
@@ -147,8 +191,6 @@ public fun split_with_percentage<T>(
 - `ctx` | `&mut TxContext` | Transaction context
 
 **Returns**: `(Coin<T>, u64, Coin<T>, u64)` - Split coin with amount, remaining coin with amount
-
-
 
 **Error Conditions**:
 - `E_PERCENTAGE`: Percentage exceeds maximum allowed value (10000)
@@ -173,23 +215,9 @@ public fun split_with_percentage_for_commission<T>(
 
 **Returns**: `(Coin<T>, u64)` - Remaining coin after commission and its amount
 
-
-
 **Error Conditions**:
 - `E_COMMISSION_PERCENTAGE`: Commission rate exceeds 3% maximum
 - `E_INVALID_PARAMETER`: Non-zero commission without valid referral address
-
-#### finalize_without_transfer
-```move
-public fun finalize_without_transfer<CoinType>(
-    coin: Coin<CoinType>,
-    order_id: u64,
-    decimal: u8,
-    _ctx: &mut TxContext,
-): (Coin<CoinType>, u64)
-```
-
-**Purpose**: Complete swap transaction without transferring coins, returns coins for further processing.
 
 **Parameters**:
 - `coin` | `Coin<CoinType>` | Output coin from swap operation
@@ -202,778 +230,6 @@ public fun finalize_without_transfer<CoinType>(
 **Access Control**: Public function, no restrictions
 
 **Error Conditions**: None
-
-### Core DEX Protocol Integrations (Router)
-
-#### Cetus CLMM Integration
-
-##### cetus_swap_a2b_with_return
-```move
-public fun cetus_swap_a2b_with_return<CoinTypeA, CoinTypeB>(
-    config: &GlobalConfig,
-    pool: &mut Pool<CoinTypeA, CoinTypeB>,
-    coins_a: vector<Coin<CoinTypeA>>,
-    by_amount_in: bool,
-    amount: u64,
-    amount_limit: u64,
-    sqrt_price_limit: u128,
-    clock: &Clock,
-    _order_id: u64,
-    _decimal: u8,
-    ctx: &mut TxContext
-): (Coin<CoinTypeB>, u64)
-```
-
-**Purpose**: Execute A-to-B swap through Cetus concentrated liquidity protocol.
-
-**Parameters**:
-- `config` | `&GlobalConfig` | Cetus global configuration object
-- `pool` | `&mut Pool<CoinTypeA, CoinTypeB>` | Cetus pool for the trading pair
-- `coins_a` | `vector<Coin<CoinTypeA>>` | Input coins vector (Token A)
-- `by_amount_in` | `bool` | Whether to specify exact input amount
-- `amount` | `u64` | Swap amount (input or output depending on by_amount_in)
-- `amount_limit` | `u64` | Minimum output amount for slippage protection
-- `sqrt_price_limit` | `u128` | Square root price limit for swap
-- `clock` | `&Clock` | Sui clock object for timing
-- `_order_id` | `u64` | Order identifier (unused in implementation)
-- `_decimal` | `u8` | Token decimal (unused in implementation)
-- `ctx` | `&mut TxContext` | Transaction context
-
-**Returns**: `(Coin<CoinTypeB>, u64)` - Output coin (Token B) and actual amount received
-
-
-
-**Error Conditions**:
-- `E_CETUS_MIN_RETURN_NOT_REACH`: Output amount below minimum threshold
-
-##### cetus_swap_b2a_with_return
-```move
-public fun cetus_swap_b2a_with_return<CoinTypeA, CoinTypeB>(
-    config: &GlobalConfig,
-    pool: &mut Pool<CoinTypeA, CoinTypeB>,
-    coins_b: vector<Coin<CoinTypeB>>,
-    by_amount_in: bool,
-    amount: u64,
-    amount_limit: u64,
-    sqrt_price_limit: u128,
-    clock: &Clock,
-    _order_id: u64,
-    _decimal: u8,
-    ctx: &mut TxContext
-): (Coin<CoinTypeA>, u64)
-```
-
-**Purpose**: Execute B-to-A swap through Cetus concentrated liquidity protocol.
-
-**Parameters**: Same as `cetus_swap_a2b_with_return` but with coins_b input and CoinTypeA output
-
-**Returns**: `(Coin<CoinTypeA>, u64)` - Output coin (Token A) and actual amount received
-
-#### Turbos CLMM Integration
-
-##### turbos_swap_a_b_with_return
-```move
-public fun turbos_swap_a_b_with_return<CoinTypeA, CoinTypeB, FeeType>(
-    pool: &mut Pool<CoinTypeA, CoinTypeB, FeeType>,
-    coins_a: vector<Coin<CoinTypeA>>,
-    amount: u64,
-    amount_threshold: u64,
-    sqrt_price_limit: u128,
-    is_exact_in: bool,
-    recipient: address,
-    deadline: u64,
-    clock: &Clock,
-    versioned: &Versioned,
-    _order_id: u64,
-    _decimal: u8,
-    ctx: &mut TxContext
-): (Coin<CoinTypeB>, u64)
-```
-
-**Purpose**: Execute A-to-B swap through Turbos concentrated liquidity protocol.
-
-**Parameters**:
-- `pool` | `&mut Pool<CoinTypeA, CoinTypeB, FeeType>` | Turbos pool with fee tier
-- `coins_a` | `vector<Coin<CoinTypeA>>` | Input coins vector (Token A)
-- `amount` | `u64` | Swap amount
-- `amount_threshold` | `u64` | Amount threshold for slippage protection
-- `sqrt_price_limit` | `u128` | Square root price limit for slippage control
-- `is_exact_in` | `bool` | Whether to use exact input (true) or exact output (false)
-- `recipient` | `address` | Address to receive output tokens
-- `deadline` | `u64` | Transaction deadline timestamp
-- `clock` | `&Clock` | Sui clock object for time validation
-- `versioned` | `&Versioned` | Turbos protocol version configuration
-- `_order_id` | `u64` | Order identifier (unused in implementation)
-- `_decimal` | `u8` | Token decimal (unused in implementation)
-- `ctx` | `&mut TxContext` | Transaction context
-
-**Returns**: `(Coin<CoinTypeB>, u64)` - Output coin (Token B) and actual amount received
-
-
-
-#### SuiSwap Integration
-
-##### suiswap_x_2_y_with_return
-```move
-public fun suiswap_x_2_y_with_return<Ty0, Ty1>(
-    pool: &mut Pool<Ty0, Ty1>,
-    coins: vector<Coin<Ty0>>,
-    amount_in: u64,
-    min_out: u64,
-    clock: &Clock,
-    _order_id: u64,
-    _decimal: u8,
-    ctx: &mut TxContext
-): (Coin<Ty1>, u64)
-```
-
-**Purpose**: Execute X-to-Y swap through SuiSwap native AMM protocol.
-
-**Parameters**:
-- `pool` | `&mut Pool<Ty0, Ty1>` | SuiSwap pool for the trading pair
-- `coins` | `vector<Coin<Ty0>>` | Input coins vector (Token X)
-- `amount_in` | `u64` | Input amount to swap
-- `min_out` | `u64` | Minimum output amount for slippage protection
-- `clock` | `&Clock` | Sui clock object for timing
-- `_order_id` | `u64` | Order identifier (unused in implementation)
-- `_decimal` | `u8` | Token decimal (unused in implementation)
-- `ctx` | `&mut TxContext` | Transaction context
-
-**Returns**: `(Coin<Ty1>, u64)` - Output coin (Token Y) and actual amount received
-
-
-
-##### suiswap_y_2_x_with_return
-```move
-public fun suiswap_y_2_x_with_return<Ty0, Ty1>(
-    pool: &mut Pool<Ty0, Ty1>,
-    coins: vector<Coin<Ty1>>,
-    amount_in: u64,
-    min_out: u64,
-    clock: &Clock,
-    _order_id: u64,
-    _decimal: u8,
-    ctx: &mut TxContext
-): (Coin<Ty0>, u64)
-```
-
-**Purpose**: Execute Y-to-X swap through SuiSwap native AMM protocol.
-
-**Parameters**: Same as `suiswap_x_2_y_with_return` but with Ty1 input coins and Ty0 output
-
-**Returns**: `(Coin<Ty0>, u64)` - Output coin (Token X) and actual amount received
-
-#### BlueMove Integration
-
-##### bluemove_swap_exact_input_with_return
-```move
-public fun bluemove_swap_exact_input_with_return<T0, T1>(
-    amount_in: u64,
-    coin_in: Coin<T0>,
-    min_return: u64,
-    dex_info: &mut Dex_Info,
-    _order_id: u64,
-    _decimal: u8,
-    ctx: &mut TxContext
-): (Coin<T1>, u64)
-```
-
-**Purpose**: Execute exact input swap through BlueMove AMM protocol.
-
-**Parameters**:
-- `amount_in` | `u64` | Input amount to swap
-- `coin_in` | `Coin<T0>` | Input coin (exact amount)
-- `min_return` | `u64` | Minimum output amount for slippage protection
-- `dex_info` | `&mut Dex_Info` | BlueMove DEX information and configuration
-- `_order_id` | `u64` | Order identifier (unused in implementation)
-- `_decimal` | `u8` | Token decimal (unused in implementation)
-- `ctx` | `&mut TxContext` | Transaction context
-
-**Returns**: `(Coin<T1>, u64)` - Output coin and actual amount received
-
-##### bluemove_stable_swap_exact_input_with_return
-```move
-public fun bluemove_stable_swap_exact_input_with_return<T0, T1>(
-    coin_in: Coin<T0>,
-    amount_in: u64,
-    min_return: u64,
-    dex_stable_info: &mut Dex_Stable_Info,
-    clock: &Clock,
-    _order_id: u64,
-    _decimal: u8,
-    ctx: &mut TxContext
-): (Coin<T1>, u64)
-```
-
-**Purpose**: Execute exact input swap through BlueMove stable swap (low slippage for correlated assets).
-
-**Parameters**:
-- `coin_in` | `Coin<T0>` | Input coin (exact amount)
-- `amount_in` | `u64` | Input amount to swap
-- `min_return` | `u64` | Minimum output amount for slippage protection
-- `dex_stable_info` | `&mut Dex_Stable_Info` | BlueMove stable swap configuration
-- `clock` | `&Clock` | Sui clock object for timing
-- `_order_id` | `u64` | Order identifier (unused in implementation)
-- `_decimal` | `u8` | Token decimal (unused in implementation)
-- `ctx` | `&mut TxContext` | Transaction context
-
-**Returns**: `(Coin<T1>, u64)` - Output coin and actual amount received
-
-
-
-#### DeepBook Integration
-
-##### deepbook_swap_base_to_quote_with_return
-```move
-public fun deepbook_swap_base_to_quote_with_return<BaseAsset, QuoteAsset>(
-    self: &mut Pool<BaseAsset, QuoteAsset>,
-    base_in: Coin<BaseAsset>,
-    min_quote_out: u64,
-    clock: &Clock,
-    ctx: &mut TxContext,
-): (Coin<QuoteAsset>, u64)
-```
-
-**Purpose**: Execute base-to-quote swap through DeepBook central limit order book.
-
-**Parameters**:
-- `self` | `&mut Pool<BaseAsset, QuoteAsset>` | DeepBook pool for the trading pair
-- `base_in` | `Coin<BaseAsset>` | Input base asset coin
-- `min_quote_out` | `u64` | Minimum quote asset output
-- `clock` | `&Clock` | Sui clock for order timing
-- `ctx` | `&mut TxContext` | Transaction context
-
-**Returns**: `(Coin<QuoteAsset>, u64)` - Output quote asset coin and amount
-
-##### deepbook_swap_quote_to_base_with_return
-```move
-public fun deepbook_swap_quote_to_base_with_return<BaseAsset, QuoteAsset>(
-    self: &mut Pool<BaseAsset, QuoteAsset>,
-    quote_in: Coin<QuoteAsset>,
-    min_base_out: u64,
-    clock: &Clock,
-    ctx: &mut TxContext,
-): (Coin<BaseAsset>, u64)
-```
-
-**Purpose**: Execute quote-to-base swap through DeepBook central limit order book.
-
-**Parameters**:
-- `self` | `&mut Pool<BaseAsset, QuoteAsset>` | DeepBook pool for the trading pair
-- `quote_in` | `Coin<QuoteAsset>` | Input quote asset coin
-- `min_base_out` | `u64` | Minimum base asset output
-- `clock` | `&Clock` | Sui clock for order timing
-- `ctx` | `&mut TxContext` | Transaction context
-
-**Returns**: `(Coin<BaseAsset>, u64)` - Output base asset coin and amount
-
-#### MovePump Integration
-
-##### movepump_buy_returns
-```move
-public fun movepump_buy_returns<CoinType>(
-    config: &mut Configuration,
-    sui_coin: Coin<SUI>,
-    dex_info: &mut Dex_Info,
-    coin_min_out: u64,
-    clock: &Clock,
-    _order_id: u64,
-    _decimal: u8,
-    ctx: &mut TxContext
-): (Coin<CoinType>, u64)
-```
-
-**Purpose**: Buy tokens through MovePump meme token trading protocol.
-
-**Parameters**:
-- `config` | `&mut Configuration` | MovePump protocol configuration
-- `sui_coin` | `Coin<SUI>` | Input SUI coin for purchase
-- `dex_info` | `&mut Dex_Info` | MovePump DEX information
-- `coin_min_out` | `u64` | Minimum output tokens
-- `clock` | `&Clock` | Sui clock for timing
-- `_order_id` | `u64` | Order identifier (unused in implementation)
-- `_decimal` | `u8` | Token decimal (unused in implementation)
-- `ctx` | `&mut TxContext` | Transaction context
-
-**Returns**: `(Coin<CoinType>, u64)` - Output tokens and amount
-
-##### movepump_sell_returns
-```move
-public fun movepump_sell_returns<CoinType>(
-    config: &mut Configuration,
-    coin: Coin<CoinType>,
-    sui_min_out: u64,
-    clock: &Clock,
-    _order_id: u64,
-    _decimal: u8,
-    ctx: &mut TxContext
-): (Coin<SUI>, u64)
-```
-
-**Purpose**: Sell tokens through MovePump meme token trading protocol.
-
-**Parameters**:
-- `config` | `&mut Configuration` | MovePump protocol configuration
-- `coin` | `Coin<CoinType>` | Input tokens to sell
-- `sui_min_out` | `u64` | Minimum SUI output
-- `clock` | `&Clock` | Sui clock for timing
-- `_order_id` | `u64` | Order identifier (unused in implementation)
-- `_decimal` | `u8` | Token decimal (unused in implementation)
-- `ctx` | `&mut TxContext` | Transaction context
-
-**Returns**: `(Coin<SUI>, u64)` - Output SUI and amount
-
-
-
-#### Liquid Staking Integration (AFSUI)
-
-##### afsui_swap_a2b_with_return
-```move
-public fun afsui_swap_a2b_with_return(
-    staked_sui_vault: &mut StakedSuiVault,
-    safe: &mut Safe<TreasuryCap<AFSUI>>,
-    sui_system_state: &mut 0x3::sui_system::SuiSystemState,
-    referral_vault: &ReferralVault,
-    coin_in: Coin<SUI>,
-    validater_address: address,
-    ctx: &mut TxContext,
-): (Coin<AFSUI>, u64)
-```
-
-**Purpose**: Stake SUI and receive AFSUI (Aftermath Finance liquid staked SUI).
-
-**Parameters**:
-- `staked_sui_vault` | `&mut StakedSuiVault` | AFSUI staking vault
-- `safe` | `&mut Safe<TreasuryCap<AFSUI>>` | Treasury cap safety wrapper
-- `sui_system_state` | `&mut SuiSystemState` | Sui network staking state
-- `referral_vault` | `&ReferralVault` | Referral tracking vault
-- `coin_in` | `Coin<SUI>` | Input SUI to stake
-- `validater_address` | `address` | Validator address for staking delegation
-- `ctx` | `&mut TxContext` | Transaction context
-
-**Returns**: `(Coin<AFSUI>, u64)` - AFSUI tokens and amount received
-
-
-
-##### afsui_swap_b2a_with_return
-```move
-public fun afsui_swap_b2a_with_return(
-    staked_sui_vault: &mut StakedSuiVault,
-    safe: &Safe<TreasuryCap<AFSUI>>,
-    referral_vault: &ReferralVault,
-    treasury: &mut Treasury,
-    coin_in: Coin<AFSUI>,
-    ctx: &mut TxContext,
-): (Coin<SUI>, u64)
-```
-
-**Purpose**: Unstake AFSUI and receive SUI plus accrued staking rewards.
-
-**Parameters**:
-- `staked_sui_vault` | `&mut StakedSuiVault` | AFSUI staking vault
-- `safe` | `&Safe<TreasuryCap<AFSUI>>` | Treasury cap safety wrapper (immutable reference)
-- `referral_vault` | `&ReferralVault` | Referral tracking vault
-- `treasury` | `&mut Treasury` | AFSUI treasury for unstaking operations
-- `coin_in` | `Coin<AFSUI>` | Input AFSUI to unstake
-- `ctx` | `&mut TxContext` | Transaction context
-
-**Returns**: `(Coin<SUI>, u64)` - SUI tokens and amount received
-
-#### Kriya Integration
-
-##### kriya_clmm_swap_token_x_with_return
-```move
-public fun kriya_clmm_swap_token_x_with_return<T0, T1>(
-    pool: &mut Pool<T0, T1>,
-    coin_x: Coin<T0>,
-    amount_in: u64,
-    min_out: u64,
-    clock: &Clock,
-    version: &Version,
-    _order_id: u64,
-    _decimal: u8,
-    ctx: &mut TxContext
-): (Coin<T1>, u64)
-```
-
-**Purpose**: Execute Token X swap through Kriya concentrated liquidity protocol.
-
-**Parameters**:
-- `pool` | `&mut Pool<T0, T1>` | Kriya CLMM pool
-- `coin_x` | `Coin<T0>` | Input coin (Token X)
-- `amount_in` | `u64` | Input amount to swap
-- `min_out` | `u64` | Minimum output amount
-- `clock` | `&Clock` | Sui clock for timing
-- `version` | `&Version` | Kriya version configuration
-- `_order_id` | `u64` | Order identifier (unused)
-- `_decimal` | `u8` | Token decimal (unused)
-- `ctx` | `&mut TxContext` | Transaction context
-
-**Returns**: `(Coin<T1>, u64)` - Output coin (Token Y) and amount
-
-##### kriya_clmm_swap_token_y_with_return
-```move
-public fun kriya_clmm_swap_token_y_with_return<T0, T1>(
-    pool: &mut Pool<T0, T1>,
-    coin_y: Coin<T1>,
-    amount_in: u64,
-    min_out: u64,
-    clock: &Clock,
-    version: &Version,
-    _order_id: u64,
-    _decimal: u8,
-    ctx: &mut TxContext
-): (Coin<T0>, u64)
-```
-
-**Purpose**: Execute Token Y swap through Kriya concentrated liquidity protocol.
-
-**Parameters**: Same as `kriya_clmm_swap_token_x_with_return` but with Token Y input and Token X output
-
-**Returns**: `(Coin<T0>, u64)` - Output coin (Token X) and amount
-
-##### kriya_amm_swap_token_x_with_return
-```move
-public fun kriya_amm_swap_token_x_with_return<T0, T1>(
-    pool: &mut Pool<T0, T1>,
-    coin_in: Coin<T0>,
-    amount_in: u64,
-    min_out: u64,
-    _order_id: u64,
-    _decimal: u8,
-    ctx: &mut TxContext
-): (Coin<T1>, u64)
-```
-
-**Purpose**: Execute Token X swap through Kriya AMM protocol.
-
-**Parameters**:
-- `pool` | `&mut Pool<T0, T1>` | Kriya AMM pool
-- `coin_in` | `Coin<T0>` | Input coin (Token X)
-- `amount_in` | `u64` | Input amount to swap
-- `min_out` | `u64` | Minimum output amount
-- `_order_id` | `u64` | Order identifier (unused)
-- `_decimal` | `u8` | Token decimal (unused)
-- `ctx` | `&mut TxContext` | Transaction context
-
-**Returns**: `(Coin<T1>, u64)` - Output coin (Token Y) and amount
-
-##### kriya_amm_swap_token_y_with_return
-```move
-public fun kriya_amm_swap_token_y_with_return<T0, T1>(
-    pool: &mut Pool<T0, T1>,
-    coin_in: Coin<T1>,
-    amount_in: u64,
-    min_out: u64,
-    _order_id: u64,
-    _decimal: u8,
-    ctx: &mut TxContext
-): (Coin<T0>, u64)
-```
-
-**Purpose**: Execute Token Y swap through Kriya AMM protocol.
-
-**Parameters**: Same as `kriya_amm_swap_token_x_with_return` but with Token Y input and Token X output
-
-**Returns**: `(Coin<T0>, u64)` - Output coin (Token X) and amount
-
-#### Aftermath Integration
-
-##### aftermath_swap_exact_in_with_return
-```move
-public fun aftermath_swap_exact_in_with_return<T0, T1, T2>(
-    pool: &mut Pool<T0>,
-    pool_registry: &PoolRegistry,
-    vault: &ProtocolFeeVault,
-    treasury: &mut Treasury,
-    insurance_fund: &mut InsuranceFund,
-    referral_vault: &ReferralVault,
-    coin_in: Coin<T1>,
-    amount_in: u64,
-    expected_coin_out: u64,
-    allowable_slippage: u64,
-    _order_id: u64,
-    _decimal: u8,
-    ctx: &mut TxContext
-): (Coin<T2>, u64)
-```
-
-**Purpose**: Execute exact input swap through Aftermath AMM protocol.
-
-**Parameters**:
-- `pool` | `&mut Pool<T0>` | Aftermath pool
-- `pool_registry` | `&PoolRegistry` | Pool registry
-- `vault` | `&ProtocolFeeVault` | Protocol fee vault
-- `treasury` | `&mut Treasury` | Treasury
-- `insurance_fund` | `&mut InsuranceFund` | Insurance fund
-- `referral_vault` | `&ReferralVault` | Referral vault
-- `coin_in` | `Coin<T1>` | Input coin
-- `amount_in` | `u64` | Input amount
-- `expected_coin_out` | `u64` | Expected output amount
-- `allowable_slippage` | `u64` | Allowable slippage
-- `_order_id` | `u64` | Order identifier (unused)
-- `_decimal` | `u8` | Token decimal (unused)
-- `ctx` | `&mut TxContext` | Transaction context
-
-**Returns**: `(Coin<T2>, u64)` - Output coin and amount
-
-#### FlowX Integration
-
-##### flowxv3_swap_a2b_with_return
-```move
-public fun flowxv3_swap_a2b_with_return<CoinTypeA, CoinTypeB>(
-    clock: &Clock,
-    versioned: &Versioned,
-    pool_registry: &mut PoolRegistry,
-    fee_rate: u64,
-    coins_a: Coin<CoinTypeA>,
-    by_amount_in: bool,
-    sqrt_price_max_limit: u128,
-    _order_id: u64,
-    _decimal: u8,
-    ctx: &mut TxContext
-): (Coin<CoinTypeB>, u64)
-```
-
-**Purpose**: Execute A-to-B swap through FlowX v3 concentrated liquidity protocol.
-
-**Parameters**:
-- `clock` | `&Clock` | Sui clock
-- `versioned` | `&Versioned` | FlowX version configuration
-- `pool_registry` | `&mut PoolRegistry` | Pool registry
-- `fee_rate` | `u64` | Fee rate for the pool
-- `coins_a` | `Coin<CoinTypeA>` | Input coin (Token A)
-- `by_amount_in` | `bool` | Exact input mode
-- `sqrt_price_max_limit` | `u128` | Price limit
-- `_order_id` | `u64` | Order identifier (unused)
-- `_decimal` | `u8` | Token decimal (unused)
-- `ctx` | `&mut TxContext` | Transaction context
-
-**Returns**: `(Coin<CoinTypeB>, u64)` - Output coin (Token B) and amount
-
-##### flowxv3_swap_b2a_with_return
-```move
-public fun flowxv3_swap_b2a_with_return<CoinTypeA, CoinTypeB>(
-    clock: &Clock,
-    versioned: &Versioned,
-    pool_registry: &mut PoolRegistry,
-    fee_rate: u64,
-    coins_b: Coin<CoinTypeB>,
-    by_amount_in: bool,
-    sqrt_price_max_limit: u128,
-    _order_id: u64,
-    _decimal: u8,
-    ctx: &mut TxContext
-): (Coin<CoinTypeA>, u64)
-```
-
-**Purpose**: Execute B-to-A swap through FlowX v3 concentrated liquidity protocol.
-
-**Parameters**: Same as `flowxv3_swap_a2b_with_return` but with Token B input and Token A output
-
-**Returns**: `(Coin<CoinTypeA>, u64)` - Output coin (Token A) and amount
-
-##### flowx_swap_exact_input_direct_with_return
-```move
-public fun flowx_swap_exact_input_direct_with_return<CoinTypeA, CoinTypeB>(
-    container: &mut Container,
-    input: Coin<CoinTypeA>,
-    ctx: &mut TxContext
-): (Coin<CoinTypeB>, u64)
-```
-
-**Purpose**: Execute direct exact input swap through FlowX v2 protocol.
-
-**Parameters**:
-- `container` | `&mut Container` | FlowX v2 container
-- `input` | `Coin<CoinTypeA>` | Input coin
-- `ctx` | `&mut TxContext` | Transaction context
-
-**Returns**: `(Coin<CoinTypeB>, u64)` - Output coin and amount
-
-
-
-### DeFi Protocol Integrations (Extended Router)
-
-#### Haedal Liquid Staking
-
-##### haedal_swap_a2b_with_return
-```move
-public fun haedal_swap_a2b_with_return(
-    sui_system_state: &mut 0x3::sui_system::SuiSystemState,
-    staking: &mut Staking,
-    coin_in: Coin<SUI>,
-    validater_address: address,
-    ctx: &mut TxContext,
-): (Coin<HASUI>, u64)
-```
-
-**Purpose**: Stake SUI through Haedal protocol and receive haSUI liquid staking tokens.
-
-**Parameters**:
-- `sui_system_state` | `&mut SuiSystemState` | Sui network staking state
-- `staking` | `&mut Staking` | Haedal staking contract
-- `coin_in` | `Coin<SUI>` | Input SUI to stake
-- `validater_address` | `address` | Specific validator to delegate to
-- `ctx` | `&mut TxContext` | Transaction context
-
-**Returns**: `(Coin<HASUI>, u64)` - haSUI tokens and amount received
-
-
-
-##### haedal_swap_b2a_with_return
-```move
-public fun haedal_swap_b2a_with_return(
-    sui_system_state: &mut 0x3::sui_system::SuiSystemState,
-    staking: &mut Staking,
-    coin_in: Coin<HASUI>,
-    ctx: &mut TxContext,
-): (Coin<SUI>, u64)
-```
-
-**Purpose**: Unstake haSUI and receive SUI plus accrued rewards through Haedal protocol.
-
-#### Scallop Lending Integration
-
-##### scallop_swap_exact_swap_a2b_with_return
-```move
-public fun scallop_swap_exact_swap_a2b_with_return<CoinType0, CoinType1>(
-    market: &mut Market,
-    s_coin_treasury: &mut SCoinTreasury<CoinType0>,
-    coin: Coin<CoinType0>,
-    min_amount: u64,
-    ctx: &mut TxContext
-): (Coin<CoinType1>, u64)
-```
-
-**Purpose**: Supply tokens to Scallop lending market and receive interest-bearing s-tokens.
-
-**Parameters**:
-- `market` | `&mut Market` | Scallop lending market state
-- `s_coin_treasury` | `&mut SCoinTreasury<CoinType0>` | S-coin treasury for token minting
-- `coin` | `Coin<CoinType0>` | Input token to supply
-- `min_amount` | `u64` | Minimum s-token output
-- `ctx` | `&mut TxContext` | Transaction context
-
-**Returns**: `(Coin<CoinType1>, u64)` - S-tokens and amount received
-
-
-
-#### Momentum v3 Integration
-
-##### momentum_swap_a2b_with_return
-```move
-public fun momentum_swap_a2b_with_return<CoinType0, CoinType1>(
-    pool: &mut Pool<CoinType0, CoinType1>,
-    coin_a: Coin<CoinType0>,
-    amount_specified: u64,
-    sqrt_price_limit: u128,
-    clock: &Clock,
-    version: &Mntv3Version,
-    ctx: &mut TxContext,
-): (Coin<CoinType1>, u64)
-```
-
-**Purpose**: Execute A-to-B swap through Momentum v3 concentrated liquidity protocol.
-
-**Parameters**:
-- `pool` | `&mut Pool<CoinType0, CoinType1>` | Momentum v3 pool
-- `coin_a` | `Coin<CoinType0>` | Input coin (Token A)
-- `amount_specified` | `u64` | Specified swap amount
-- `sqrt_price_limit` | `u128` | Square root price limit for slippage control
-- `clock` | `&Clock` | Sui clock for timing
-- `version` | `&Mntv3Version` | Momentum v3 version compatibility
-- `ctx` | `&mut TxContext` | Transaction context
-
-**Returns**: `(Coin<CoinType1>, u64)` - Output coin (Token B) and amount
-
-
-
-#### BlueFin Spot Trading
-
-##### bluefin_spot_swap_a2b_with_return
-```move
-public fun bluefin_spot_swap_a2b_with_return<CoinTypeA, CoinTypeB>(
-    clock: &Clock,
-    protocol_config: &GlobalConfig,
-    pool: &mut Pool<CoinTypeA, CoinTypeB>,
-    coins_a: Coin<CoinTypeA>,
-    amount_specified: u64,
-    sqrt_price_limit: u128,
-    ctx: &mut TxContext
-): (Coin<CoinTypeB>, u64)
-```
-
-**Purpose**: Execute A-to-B swap through BlueFin professional spot trading protocol.
-
-**Parameters**:
-- `clock` | `&Clock` | Sui clock for timing validation
-- `protocol_config` | `&GlobalConfig` | BlueFin global configuration
-- `pool` | `&mut Pool<CoinTypeA, CoinTypeB>` | BlueFin trading pool
-- `coins_a` | `Coin<CoinTypeA>` | Input coin (Token A)
-- `amount_specified` | `u64` | Specified swap amount
-- `sqrt_price_limit` | `u128` | Price limit for professional trading
-- `ctx` | `&mut TxContext` | Transaction context
-
-
-
-#### MetaVault Integration
-
-##### metastable_swap_a2b_with_return
-```move
-public fun metastable_swap_a2b_with_return<CoinTypeA, CoinTypeB>(
-    vault: &mut Vault<CoinTypeA, CoinTypeB>,
-    deposit_cap: &DepositCap<CoinTypeA, CoinTypeB>,
-    withdraw_cap: &WithdrawCap<CoinTypeA, CoinTypeB>,
-    coin_a: Coin<CoinTypeA>,
-    min_amount: u64,
-    version: &Version,
-    ctx: &mut TxContext
-): (Coin<CoinTypeB>, u64)
-```
-
-**Purpose**: Execute A-to-B swap through MetaVault metastable asset management protocol.
-
-**Parameters**:
-- `vault` | `&mut Vault<CoinTypeA, CoinTypeB>` | MetaVault vault for asset pair
-- `deposit_cap` | `&DepositCap<CoinTypeA, CoinTypeB>` | Deposit capability
-- `withdraw_cap` | `&WithdrawCap<CoinTypeA, CoinTypeB>` | Withdraw capability
-- `coin_a` | `Coin<CoinTypeA>` | Input coin (Token A)
-- `min_amount` | `u64` | Minimum output for slippage protection
-- `version` | `&Version` | MetaVault version compatibility
-- `ctx` | `&mut TxContext` | Transaction context
-
-
-
-#### Magma CLMM Integration
-
-##### magma_swap_token_x_with_return
-```move
-public fun magma_swap_token_x_with_return<T0, T1>(
-    global_config: &MagmaGlobalConfig,
-    pool: &mut MagmaPool<T0, T1>,
-    coin_x: Coin<T0>,
-    amount: u64,
-    sqrt_price_limit: u128,
-    is_exact_in: bool,
-    clock: &Clock,
-    ctx: &mut TxContext
-): (Coin<T1>, u64)
-```
-
-**Purpose**: Execute Token X swap through Magma concentrated liquidity protocol.
-
-**Parameters**:
-- `global_config` | `&MagmaGlobalConfig` | Magma global configuration
-- `pool` | `&mut MagmaPool<T0, T1>` | Magma CLMM pool
-- `coin_x` | `Coin<T0>` | Input coin (Token X)
-- `amount` | `u64` | Swap amount
-- `sqrt_price_limit` | `u128` | Square root price limit
-- `is_exact_in` | `bool` | Exact input vs exact output mode
-- `clock` | `&Clock` | Sui clock for timing
-- `ctx` | `&mut TxContext` | Transaction context
-
-
 
 ## Events Reference
 
@@ -1021,8 +277,6 @@ event::emit(HopRecord{
     out_amount: 500000  // 0.5 USDC from this hop
 });
 ```
-
-
 
 ## Error Reference
 
@@ -1073,8 +327,100 @@ event::emit(HopRecord{
 **Specific To**: Protocols in extended router
 **Resolution**: Review slippage settings for experimental protocols
 
+## Constants and Configuration
 
+### System Constants
+```move
+pub const MAX_COMMISSION_RATE: u64 = 300;        // 3% maximum commission
+pub const MAX_PERCENTAGE: u64 = 10000;           // 100% in basis points
+pub const PERCENTAGE_DIVISOR: u64 = 10000;       // Basis point divisor
+```
 
----
+### Commission Configuration
+```move
+pub const COMMISSION_RATE_LIMIT: u64 = 300;      // 3% maximum (300 basis points)
+pub const COMMISSION_DENOMINATOR: u64 = 10000;   // 100% (10000 basis points)
+```
 
-*This technical reference provides complete API documentation for both DEX Router contracts. For implementation examples and integration patterns, see the accompanying guides.md documentation.* 
+### Fee Structures
+
+#### Commission Calculation
+- **Input-based Commission**: `commission = amount_in * rate / (denominator - rate)`
+- **Output-based Commission**: `commission = amount_out * rate / denominator`
+
+#### Basis Points System
+- **1%**: 100 basis points
+- **3%**: 300 basis points (maximum allowed)
+- **100%**: 10000 basis points
+
+### Gas Budget Recommendations
+```move
+pub const BASIC_SWAP_GAS: u64 = 4051120;         // Basic single protocol swap
+pub const COMPLEX_ROUTING_GAS: u64 = 10000000;   // Multi-protocol routing
+pub const COMMISSION_SWAP_GAS: u64 = 6000000;    // Swap with commission
+```
+
+## Advanced Features
+
+### Multi-Protocol Routing
+The DEX Router supports complex routing strategies across multiple protocols:
+
+- **Sequential Routing**: Execute swaps in sequence across different protocols
+- **Parallel Routing**: Split orders across multiple protocols simultaneously  
+- **Percentage-based Splitting**: Distribute trades based on configurable percentages
+
+### Commission System
+Comprehensive commission management for partner integrations:
+
+- **Flexible Rates**: Configurable commission rates up to 3%
+- **Basis Points**: Precise rate control using basis point system
+- **Automatic Distribution**: Real-time commission transfer to referral addresses
+
+### Event System
+Comprehensive event emission for analytics and monitoring:
+
+- **Transaction Tracking**: Unique order IDs for all operations
+- **Commission Auditing**: Detailed commission payment records
+- **Hop Tracking**: Individual swap step monitoring for multi-hop routes
+
+## Security Considerations
+
+### Access Control
+- All functions are public with appropriate parameter validation
+- Commission recipients must be valid addresses
+- Transaction context validation prevents unauthorized operations
+
+### Numerical Safety
+- All arithmetic operations use safe math with overflow protection
+- Precision maintained for token operations with proper decimal handling
+- Commission calculations include bounds checking
+- Rate limits prevent excessive fees
+
+### Parameter Validation
+- Commission rates capped at reasonable maximums (3%)
+- Percentage values validated within acceptable ranges (0-10000 basis points)
+- Minimum amounts must be greater than zero
+- Address validation for commission recipients
+
+### Error Handling
+- Comprehensive error codes for all failure scenarios
+- Protocol-specific error handling for different DEX integrations
+
+## Integration Guide
+
+### Basic Integration
+1. **Simple Swap**: Use protocol-specific swap functions for single DEX integration
+2. **Commission Integration**: Use `split_with_percentage_for_commission` for fee collection
+3. **Finalization**: Always call `finalize` to complete transactions properly
+
+### Advanced Integration
+1. **Multi-Protocol Routing**: Combine multiple swap functions for optimal execution
+2. **Commission Management**: Implement comprehensive fee collection strategies
+3. **Event Monitoring**: Subscribe to events for real-time analytics and monitoring
+
+### Best Practices
+1. **Gas Management**: Set appropriate gas budgets based on operation complexity
+2. **Slippage Control**: Implement reasonable slippage tolerances for market conditions
+3. **Error Handling**: Implement comprehensive error handling for all scenarios
+4. **Testing**: Thoroughly test all integration points with various market conditions
+5. **Monitoring**: Implement proper monitoring and alerting for production deployments
