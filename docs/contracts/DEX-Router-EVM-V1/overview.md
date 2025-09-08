@@ -24,21 +24,21 @@ The DEX-Router-EVM follows a modular architecture designed for extensibility and
 
 ### Core Router Contract
 - **DexRouter.sol**: The main entry point contract that orchestrates all swap operations
-- **Version**: v1.0.4-toB-commission
-- **Features**: Smart routing, batch execution, commission handling, multi-protocol support
+- **Version**: v1.0.5-tee
+- **Features**: Smart routing, batch execution, enhanced error handling, robust commission processing, multi-protocol support, tee-required function entries
 
 ### ExactOut Router System
 - **DexRouterExactOut.sol**: Specialized router for exact output swaps
-- **Version**: v1.0.1
-- **Features**: Exact output swap execution, commission handling, multi-protocol support
+- **Version**: v1.0.5-tee
+- **Features**: Exact output swap execution, enhanced commission handling, improved error management, multi-protocol support
 
 ### Base Router Components
 - **UnxswapRouter**: Handles Uniswap V2-style swaps with optimized routing
 - **UnxswapV3Router**: Specialized for Uniswap V3 protocol interactions
 - **UnxswapExactOutRouter**: Handles Uniswap V2-style exact output swaps
 - **UnxswapV3ExactOutRouter**: Specialized for Uniswap V3 exact output swaps
-- **WrapETHSwap**: Manages ETH/WETH wrapping and unwrapping operations
-- **CommissionLib**: Implements commission fee collection and distribution
+- **UniswapTokenInfoHelper**: Enhanced token management library that replaced WrapETHSwap for better token handling and commission validation
+- **CommissionLib**: Implements robust commission fee collection and distribution with enhanced referrer support
 
 ### Adapter Ecosystem
 The router supports **80+ DEX protocols** through dedicated adapter contracts:
@@ -66,7 +66,8 @@ The router supports **80+ DEX protocols** through dedicated adapter contracts:
 - **UniversalERC20**: Unified ETH/ERC20 handling
 - **TickMath**: Uniswap V3 mathematical operations
 - **PMMLib**: Price-Making Market operations
-- **CommonUtils**: Shared utility functions
+- **CommonUtils**: Centralized abstract contract providing shared utility functions, constants, and common functionalities across all router contracts
+- **UniswapTokenInfoHelper**: Helper functions for extracting token information from encoded pool arrays for unxswap and uniswapV3 methods
 
 ## High-Level Functionality
 
@@ -75,6 +76,7 @@ The router supports **80+ DEX protocols** through dedicated adapter contracts:
 - **Batch processing**: Execute multiple swaps in a single transaction
 - **Optimal pricing**: Find the best rates across all available liquidity sources
 - **Slippage protection**: Configurable minimum return amounts
+- **Enhanced error handling**: Custom revert logic for better error reporting and debugging
 
 ### Swap Types
 
@@ -97,12 +99,14 @@ The router supports **80+ DEX protocols** through dedicated adapter contracts:
 - **Commission integration**: Dual-rate fee collection system with referral support
 
 ### Advanced Features
-- **Commission system**: Built-in referral and fee collection mechanism with dual-rate/bi-directional support
+- **Enhanced commission system**: Built-in referral and fee collection mechanism with dual-rate/bi-directional support and improved referrer handling
+- **Robust error handling**: Custom revert mechanisms with detailed error messages for better debugging and user experience
 - **Memo functionality**: Brings arbitrary data onchain for reference without execution 
 - **Pre-funded swaps**: Swaps using tokens already held in the router contract
 - **Native token handling**: Seamless ETH/WETH conversion
 - **Immutable design**: Decentralized operation without administrative controls
 - **Gas optimization**: Efficient batch execution and path optimization
+- **Improved code maintainability**: Enhanced variable naming conventions and cleaner error management
 
 ### Supported Swap Types
 1. **Multi-hop swaps**: Complex routing through multiple protocols
@@ -111,6 +115,16 @@ The router supports **80+ DEX protocols** through dedicated adapter contracts:
 4. **Exact output swaps**: Specify exact output amount with maximum input limit
 5. **Unxswap**: Gas-efficient swaps between Uniswap V2-like pools with optimized routing
 6. **Uniswap V3 swaps**: Gas-efficient swaps between Uniswap V3-like pools with optimized routing
+
+### New Tee-Required Function Entries (v1.0.5-tee)
+The v1.0.5-tee update introduces three new function entries specifically designed for tee requirements:
+
+1. **uniswapV3SwapToWithBaseRequest**: Enhanced Uniswap V3 swaps with structured base request parameters and receiver specification
+2. **swapWrapToWithBaseRequest**: ETH/WETH swap functionality with structured base request parameters and receiver specification  
+3. **unxswapToWithBaseRequest**: Enhanced Unxswap functionality with structured base request parameters and receiver specification
+
+These functions provide improved parameter structure and enhanced compatibility while maintaining full backward compatibility with existing functionality.
+
 
 ## Contract Architecture
 
@@ -167,7 +181,8 @@ DEX-Router-EVM/
 - **ExactOut Contract**: `contracts/8/DexRouterExactOut.sol`
 - **Adapter Interfaces**: `contracts/8/interfaces/IAdapter.sol`
 - **Commission Logic**: `contracts/8/libraries/CommissionLib.sol`
-- **Utility Libraries**: `contracts/8/libraries/CommonUtils.sol`
+- **Common Utilities**: `contracts/8/libraries/CommonUtils.sol`
+- **Token Info Helper**: `contracts/8/libraries/UniswapTokenInfoHelper.sol`
 - **ExactOut Routers**: `contracts/8/UnxswapExactOutRouter.sol`, `contracts/8/UnxswapV3ExactOutRouter.sol`
 
 ## Integration Guide
@@ -245,7 +260,9 @@ The router system is designed to work across multiple EVM-compatible networks:
 
 - **DeadLine checks**: All swaps must complete before specified deadLines
 - **Minimum return enforcement**: Slippage protection on all trades
+- **Enhanced error handling**: Custom revert logic provides detailed error messages instead of generic failures
 - **Immutable operations**: No administrative backdoors or privileged access
-- **Secure token handling**: Using OpenZeppelin's SafeERC20
+- **Secure token handling**: Using OpenZeppelin's SafeERC20 with improved error reporting
 - **Reentrancy protection**: Built-in protection against reentrancy attacks
+- **Robust commission processing**: Enhanced error management for commission transfers and referrer operations
 
