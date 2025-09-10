@@ -265,3 +265,4 @@ The router system is designed to work across multiple EVM-compatible networks:
 - **Secure token handling**: Using OpenZeppelin's SafeERC20 with improved error reporting
 - **Reentrancy protection**: Built-in protection against reentrancy attacks
 - **Robust commission processing**: Enhanced error management for commission transfers and referrer operations
+
