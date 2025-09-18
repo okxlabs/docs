@@ -1,6 +1,6 @@
 # DEX Router Documentation
 
-This repository provides comprehensive documentation and example smart contracts for DEX Router products, supporting both EVM and Solana ecosystems.
+This repository provides comprehensive documentation and example smart contracts for DEX Router products, supporting EVM, Solana, and SUI ecosystems.
 
 ## Project Structure
 
@@ -13,6 +13,10 @@ docs/
         overview.md
         technical-reference.md
       DEX-Router-Solana-V1/
+        guides.md
+        overview.md
+        technical-reference.md
+      DEX-Router-Sui-V1/
         guides.md
         overview.md
         technical-reference.md
@@ -36,6 +40,7 @@ docs/
 
 - **docs/contracts/DEX-Router-EVM-V1/**: Documentation for the EVM version of the DEX Router, including overview, guides, and technical reference.
 - **docs/contracts/DEX-Router-Solana-V1/**: Documentation for the Solana version of the DEX Router, including overview, guides, and technical reference.
+- **docs/contracts/DEX-Router-Sui-V1/**: Documentation for the SUI version of the DEX Router, including overview, guides, and technical reference.
 - **examples/DEX-Router-EVM-V1/**: Example Solidity contracts and interfaces for the EVM DEX Router.
 - **examples/DEX-Router-Solana-V1/**: (Reserved for Solana contract examples.)
 
@@ -49,14 +54,14 @@ docs/
 
 ### Usage
 
-- Browse documentation in `docs/docs/contracts/` for both EVM and Solana routers.
+- Browse documentation in `docs/docs/contracts/` for EVM, Solana, and SUI routers.
 - Explore example smart contracts in the `docs/examples/` directory.
 
 ## Contributing
 
 We welcome contributions! Please follow these steps:
 
-1. Pick the appropriate section for your addition (EVM or Solana, docs or examples).
+1. Pick the appropriate section for your addition (EVM, Solana, or SUI, docs or examples).
 2. Add new documentation under the correct folder:
    - `overview.md` for product overviews
    - `guides.md` for step-by-step guides
