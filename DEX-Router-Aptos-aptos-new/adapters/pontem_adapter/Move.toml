@@ -1,0 +1,16 @@
+[package]
+name = "pontem_adapter"
+version = "0.0.0"
+
+# set 
+[addresses]
+pontem_adapter = "0xdf47142109d60a113b21f6a47875e5f4f9d53bfc86c2cec4116ca5ddc6c43e4e"
+
+
+[dependencies]
+Liquidswap = { local = "../../interface/pontem-Liquidswap" }
+
+[dependencies.AptosFramework]
+git = "https://github.com/aptos-labs/aptos-core.git"
+subdir = "aptos-move/framework/aptos-framework"
+rev = 'mainnet'

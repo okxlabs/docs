@@ -1,0 +1,14 @@
+[package]
+name = "hyperion_adapter"
+version = "0.0.0"
+
+[addresses]
+hyperion_adapter = "0xdb09087d016d9e1fdbaeb4c11dc3eddab739236616a8040a770b3111e0282032"
+
+[dependencies]
+dex = { local = "../../interface/hyperion" }
+
+[dependencies.AptosFramework]
+git = "https://github.com/aptos-labs/aptos-core.git"
+subdir = "aptos-move/framework/aptos-framework"
+rev = 'mainnet'

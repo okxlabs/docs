@@ -1,0 +1,11 @@
+[package]
+name = "cellana"
+version = "0.0.0"
+
+[addresses]
+cellana = "4bf51972879e3b95c4781a5cdcb9e1ee24ef483e7d22f2d903626f126df62bd1"
+
+[dependencies.AptosFramework]
+git = "https://github.com/aptos-labs/aptos-core.git"
+subdir = "aptos-move/framework/aptos-framework"
+rev = 'mainnet'

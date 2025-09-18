@@ -1,8 +1,8 @@
-# DEX-Router-Aptos Technical Reference
+# DEX-Router-Aptos-V1 Technical Reference
 
 ## Contract Overview
 
-The DEX-Router-Aptos is a sophisticated Move smart contract system that provides DEX aggregation and optimal routing capabilities. This document provides complete technical specifications for all exported interfaces and functions.
+The DEX-Router-Aptos-V1 is a sophisticated Move smart contract system that provides DEX aggregation and optimal routing capabilities. This document provides complete technical specifications for all exported interfaces and functions.
 
 > **📝 Auto-Generated Documentation**: This technical reference is automatically generated from Move source code NatSpec comments. For the most up-to-date information, refer to the source contracts.
 
@@ -79,12 +79,14 @@ public entry fun unxswap<X, Y, Z, M, E1, E2, E3>(
 - Detailed event emission for each routing hop
 - Gas-optimized PDA asset management
 
-**Error Conditions:**
+**Error Conditions (Updated from latest code):**
 - `E_OUTPUT_LESS_THAN_MINIMUM (2)`: Output below minimum threshold
-- `E_LENGTH_NOT_EQUAL (6)`: Inconsistent vector lengths
-- `E_OUT_HIP (5)`: More than 3 hops specified
-- `E_INVALID_FA_INFO_LENGTH (8)`: Asset vectors not exactly 4 elements
-- `E_INVALID_MIN_OUT (9)`: Zero or invalid minimum output
+- `E_DEX_POOL_LENGTH_MISMATCH (6)`: dex_types and pool_types length mismatch  
+- `E_POOL_DIRECTION_LENGTH_MISMATCH (7)`: pool_types and is_x_to_y length mismatch
+- `E_OUT_HOP (5)`: More than 3 hops specified
+- `E_INVALID_ASSET_OBJECTS_LENGTH (9)`: Asset objects vector not exactly 4 elements
+- `E_INVALID_FA_FLAGS_LENGTH (10)`: FA flags vector not exactly 4 elements  
+- `E_INVALID_MIN_OUT (11)`: Zero or invalid minimum output
 
 ### Router Core Functions
 
@@ -168,21 +170,25 @@ struct OrderRecord has drop, store { /* fields above */ }
 
 ## Error Reference
 
-### Standard Error Codes
+### Standard Error Codes (Updated from aggregator.move)
 
 ```move
-// Core error constants
+// Aggregator error constants (lines 17-28)
 const E_OUTPUT_LESS_THAN_MINIMUM: u64 = 2;
 const E_UNKNOWN_DEX: u64 = 3;
-const E_FA_NOT_SUPPORTED: u64 = 4;
-const E_OUT_HIP: u64 = 5;
-const E_LENGTH_NOT_EQUAL: u64 = 6;
-const E_FAULT_OUT_AMOUNT: u64 = 7;
-const E_INVALID_FA_INFO_LENGTH: u64 = 8;
-const E_INVALID_MIN_OUT: u64 = 9;
+const E_NOT_ADMIN: u64 = 4;
+const E_OUT_HOP: u64 = 5;
+const E_DEX_POOL_LENGTH_MISMATCH: u64 = 6;
+const E_POOL_DIRECTION_LENGTH_MISMATCH: u64 = 7;
+const E_FAULT_OUT_AMOUNT: u64 = 8;
+const E_INVALID_ASSET_OBJECTS_LENGTH: u64 = 9;
+const E_INVALID_FA_FLAGS_LENGTH: u64 = 10;
+const E_INVALID_MIN_OUT: u64 = 11;
 
-// Router-specific errors
+// Router-specific errors (router.move lines 36-39)
 const E_NORMAL: u64 = 0;
+const E_NOT_ADMIN: u64 = 1;
+const E_FA_NOT_SUPPORTED: u64 = 4;
 ```
 
 ### Error Descriptions and Solutions
@@ -197,22 +203,22 @@ const E_NORMAL: u64 = 0;
 **Solution**: Use supported DEX constants (3, 7, 8, 9, 10)  
 **Prevention**: Validate DEX types against supported protocol list
 
-#### `E_OUT_HIP (5)`
+#### `E_OUT_HOP (5)`
 **Cause**: More than 3 routing hops specified  
 **Solution**: Reduce routing path to maximum 3 hops  
 **Prevention**: Design routing paths within system limits
 
-#### `E_LENGTH_NOT_EQUAL (6)`
+#### `E_DEX_POOL_LENGTH_MISMATCH (6)`
 **Cause**: Inconsistent vector lengths in routing parameters  
 **Solution**: Ensure all routing vectors have equal length  
 **Prevention**: Validate vector lengths before function calls
 
-#### `E_INVALID_FA_INFO_LENGTH (8)`
+#### `E_INVALID_ASSET_OBJECTS_LENGTH (9)`
 **Cause**: Asset object or FA flag vectors not exactly 4 elements  
 **Solution**: Provide exactly 4 elements in asset_objects and is_FA vectors  
 **Prevention**: Use proper vector construction with required length
 
-#### `E_INVALID_MIN_OUT (9)`
+#### `E_INVALID_MIN_OUT (11)`
 **Cause**: Zero or invalid minimum output specified  
 **Solution**: Specify positive minimum output for slippage protection  
 **Prevention**: Always set reasonable minimum output values
@@ -497,22 +503,22 @@ const E_FA_NOT_SUPPORTED: u64 = 4;
 **Solution**: Use supported DEX constants (3, 7, 8, 9, 10)  
 **Prevention**: Validate DEX types against supported protocol list
 
-#### `E_OUT_HIP (5)`
+#### `E_OUT_HOP (5)`
 **Cause**: More than 3 routing hops specified  
 **Solution**: Reduce routing path to maximum 3 hops  
 **Prevention**: Design routing paths within system limits
 
-#### `E_LENGTH_NOT_EQUAL (6)`
+#### `E_DEX_POOL_LENGTH_MISMATCH (6)`
 **Cause**: Inconsistent vector lengths in routing parameters  
 **Solution**: Ensure all routing vectors have equal length  
 **Prevention**: Validate vector lengths before function calls
 
-#### `E_INVALID_FA_INFO_LENGTH (8)`
+#### `E_INVALID_ASSET_OBJECTS_LENGTH (9)`
 **Cause**: Asset object or FA flag vectors not exactly 4 elements  
 **Solution**: Provide exactly 4 elements in asset_objects and is_FA vectors  
 **Prevention**: Use proper vector construction with required length
 
-#### `E_INVALID_MIN_OUT (9)`
+#### `E_INVALID_MIN_OUT (11)`
 **Cause**: Zero or invalid minimum output specified  
 **Solution**: Specify positive minimum output for slippage protection  
 **Prevention**: Always set reasonable minimum output values
@@ -597,6 +603,47 @@ public fun track_swap_performance(events: vector<OrderRecord>): (u64, u64) {
 3. **Security**: Regular security audits and updates
 4. **Documentation**: Maintain updated integration documentation
 
+## TypeScript Integration Reference
+
+### Test Suite Structure
+The DEX-Router-Aptos-V1 includes a comprehensive TypeScript test suite for integration validation:
+
+```typescript
+// scripts/config.ts - Configuration constants
+export const PACKAGE_ADDRESS = "0x3faf7a406a14b9cdeb842f9caf23826eb19cc78d11997298b7e0115b193be8a1";
+export const DEPLOYER_ADDRESS = "0xd2be0d7edad1cb3ecc9bee26bcfc3d595385e9fe309b115ca01e207bc234aefd";
+
+export const DEX = {
+    PONTEM: 3,
+    PANCAKE: 7,
+    PONTEM_V2: 8, 
+    CELLANA: 9,
+    HYPERION: 10
+} as const;
+
+// scripts/testHelper.ts - Core testing utilities
+export interface SwapConfig {
+    amountIn: number;
+    minAmountOut: number;
+    dexTypes: number[];
+    poolTypes: number[];
+    faConfig?: FAConfig;
+}
+
+export interface FAConfig {
+    inputIsFA?: boolean;
+    outputIsFA?: boolean;
+    inputFAAddress?: string;
+    outputFAAddress?: string;
+}
+```
+
+### Integration Patterns
+- **Real mainnet testing**: All tests execute against live contracts
+- **FA format validation**: Complete Fungible Asset integration testing  
+- **Multi-protocol routing**: Cross-DEX routing validation
+- **Error handling**: Comprehensive error scenario testing
+
 ---
 
 ## Appendix
@@ -647,6 +694,6 @@ const DEX_HYPERION: u8 = 10;  // ✅ Hyperion Protocol (FA Support)
 
 ### Version History
 
-- **V2.0.0**: Current version with full FA support and 5 integrated protocols
+- **V2.0.0**: Current version with full FA support and 10+ integrated protocols
 - **V1.x**: Legacy version with Coin-only support
 - **Future**: Additional protocol integrations and advanced routing features 

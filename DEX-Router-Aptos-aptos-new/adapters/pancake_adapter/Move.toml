@@ -1,0 +1,14 @@
+[package]
+name = "pancake_adapter"
+version = "0.0.0"
+
+[addresses]
+pancake_adapter = "0x866381013ac4d857d50bca26d2a1a392ac4f1f79be95862a63ddd2d539e384d7"
+
+[dependencies]
+PancakeSwap = { local = "../../interface/pancake" }
+
+[dependencies.AptosFramework]
+git = "https://github.com/aptos-labs/aptos-core.git"
+subdir = "aptos-move/framework/aptos-framework"
+rev = 'mainnet'
