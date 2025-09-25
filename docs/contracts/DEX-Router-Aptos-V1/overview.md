@@ -9,15 +9,21 @@ DEX-Router-Aptos-V1 is a sophisticated DEX aggregation and routing system built 
 The DEX-Router-Aptos-V1 follows a modular architecture designed for extensibility and gas optimization:
 
 ```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   User/DApp     │───▶│  aggregator.move │───▶│  Adapter Layer  │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
+┌─────────────────┐    ┌──────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   User/DApp     │───▶│  aggregator.move │───▶│   router.move    │───▶│  Adapter Layer  │
+└─────────────────┘    └──────────────────┘    └──────────────────┘    └─────────────────┘
+                              │                         │                         │
+                              │                         │                         ▼
+                              │                         │                ┌─────────────────┐
+                              │                         │                │ DEX Protocols   │
+                              │                         │                │ (5+ Supported)  │
+                              │                         │                └─────────────────┘
                               │                         │
                               ▼                         ▼
-                       ┌──────────────────┐    ┌─────────────────┐
-                       │  router.move &   │    │ DEX Protocols   │
-                       │  proxy.move      │    │ (5+ Supported)  │
-                       └──────────────────┘    └─────────────────┘
+                       ┌──────────────────────────────────────┐
+                       │             proxy.move               │
+                       │         (PDA Management)             │
+                       └──────────────────────────────────────┘
 ```
 
 ## High-Level Components
@@ -34,7 +40,7 @@ The DEX-Router-Aptos-V1 follows a modular architecture designed for extensibilit
 - **Features**: PDA pattern implementation, automatic coin registration, permission isolation, gas optimization
 
 ### Adapter Ecosystem
-The router supports **10+ DEX protocols** through dedicated adapter contracts:
+The router supports **5+ DEX protocols** through dedicated adapter contracts:
 
 #### Major Aptos DEX Protocols
 - **Pontem Liquidswap**: V1 and V2 adapters for standard AMM pools
@@ -42,12 +48,6 @@ The router supports **10+ DEX protocols** through dedicated adapter contracts:
 - **Cellana Finance**: First-class Fungible Asset (FA) support with stable/volatile pools
 - **Hyperion Protocol**: Concentrated liquidity V3-style with multiple fee tiers
 
-#### Specialized Protocols
-- **AnimeSwap**: Community-driven AMM with gaming integrations
-- **Hippo Labs**: Advanced AMM with yield optimization
-- **Econia Protocol**: Central limit order book (CLOB) integration
-- **Basiq Protocol**: Multi-asset yield farming platform
-- **Others**: Additional Aptos-native protocols
 
 ### Support Libraries
 - **Aptos Framework**: Native coin and fungible asset management
@@ -58,7 +58,7 @@ The router supports **10+ DEX protocols** through dedicated adapter contracts:
 ## High-Level Functionality
 
 ### Smart Routing
-- **Multi-path execution**: Split orders across multiple DEXs simultaneously
+- **Multi-path execution**: Route through multiple DEXs for optimal pricing
 - **Multi-hop processing**: Execute up to 3-hop routing in a single transaction
 - **Optimal pricing**: Find the best rates across all available liquidity sources
 - **Slippage protection**: Configurable minimum return amounts
@@ -80,7 +80,7 @@ The router supports **10+ DEX protocols** through dedicated adapter contracts:
 
 ### Transaction Management
 - **Resource Account (PDA)**: Secure intermediate asset custody using deterministic addresses
-- **Automatic Registration**: Seamless coin registration and FA initialization  
+- **Automatic Registration**: Seamless coin registration  
 - **Event Emission**: Comprehensive tracking with detailed OrderRecord events
 - **Gas Optimization**: Efficient account reuse and batch processing
 
@@ -105,20 +105,7 @@ The router supports **10+ DEX protocols** through dedicated adapter contracts:
 ### Multi-Protocol Routing System
 The router system provides specialized functionality for multi-hop execution across different DEX protocols:
 
-```
-┌─────────────────────┐    ┌──────────────────────┐    ┌─────────────────────┐
-│   User/DApp         │───▶│   aggregator.move    │───▶│   Direct Protocol   │
-└─────────────────────┘    └──────────────────────┘    └─────────────────────┘
-                                    │                           │
-                                    ▼                           ▼
-                            ┌──────────────────────┐    ┌─────────────────────┐
-                            │    router.move       │    │   Adapter Layer     │
-                            │    proxy.move        │    │   (Protocol         │
-                            │                      │    │   Specific)         │
-                            └──────────────────────┘    └─────────────────────┘
-```
-
-#### Key Differences from Single-Protocol Routing:
+#### Key Features of Multi-Protocol Routing:
 1. **Multi-Hop Execution**: Works across up to 3 different protocols in sequence
 2. **Asset Format Flexibility**: Handles mixed Coin/FA routing seamlessly
 3. **Resource Account Pattern**: Uses PDA for secure intermediate asset custody
@@ -132,24 +119,21 @@ The router system provides specialized functionality for multi-hop execution acr
 DEX-Router-Aptos-V1/
 ├── Move.toml                 # Main package configuration
 ├── sources/
-│   ├── aggregator.move       # Main entry point contract (348 lines)
-│   ├── router.move          # Core routing logic (106 lines)
-│   └── proxy.move           # PDA management (38 lines)
+│   ├── aggregator.move       # Main entry point contract
+│   ├── router.move          # Core routing logic
+│   └── proxy.move           # PDA management
 ├── adapters/
-│   ├── pontem_adapter/      # Liquidswap V1 integration
-│   ├── pontem_adapter_v2/   # Liquidswap V2 integration
-│   ├── pancake_adapter/     # PancakeSwap Aptos
 │   ├── cellana_adapter/     # FA-ready Cellana integration
 │   ├── hyperion_adapter/    # Concentrated liquidity V3
-│   ├── anime_adapter/       # AnimeSwap (ready-to-deploy)
-│   ├── hippo_adapter/       # Hippo Labs protocol
-│   ├── econia_adapter/      # Econia order book
-│   └── basiq_adapter/       # Basiq protocol
+│   ├── pancake_adapter/     # PancakeSwap Aptos
+│   ├── pontem_adapter/      # Liquidswap V1 integration
+│   └── pontem_adapter_v2/   # Liquidswap V2 integration
 ├── interface/
-│   ├── pontem-Liquidswap/   # Pontem protocol interface
 │   ├── cellana/             # Cellana protocol interface  
 │   ├── hyperion/            # Hyperion protocol interface
-│   └── pancake/             # PancakeSwap interface
+│   ├── pancake/             # PancakeSwap interface
+│   ├── pontem-Liquidswap/   # Pontem V1 protocol interface
+│   └── pontem-Liquidswap-v2/ # Pontem V2 protocol interface
 ├── scripts/
 │   ├── config.ts            # Test configuration and constants
 │   ├── testHelper.ts        # Testing utility functions
@@ -157,8 +141,11 @@ DEX-Router-Aptos-V1/
 │   └── tests/
 │       ├── singleHop.ts     # Single-hop swap tests
 │       └── multiHop.ts      # Multi-hop routing tests
+├── audit/
+│   └── dexrouter_aptos.pdf  # Security audit report
 ├── package.json             # TypeScript dependencies
 ├── tsconfig.json            # TypeScript configuration
+├── LICENSE                  # MIT license
 └── README.md                # Project documentation
 ```
 
@@ -175,13 +162,13 @@ DEX-Router-Aptos-V1/
 ### Contract Deployment
 The router system consists of multiple Move modules that need to be deployed in sequence:
 
-1. **Library contracts**: Deploy utility and commission libraries
-2. **Adapter contracts**: Deploy protocol-specific adapters
-3. **Main router**: Deploy the aggregator with all dependencies
+1. **Adapters**: Deploy adapter contracts that interface with existing DEX protocols
+2. **Main router**: Deploy the aggregator with adapter dependencies
+3. **Resource account**: Initialize PDA for secure asset management
 
 ### Prerequisites
-- **Move Compiler**: Version 2.0+ with Aptos framework support
-- **Aptos CLI**: Latest version for deployment and testing
+- **Aptos CLI**: v7.7.0 for deployment and testing
+- **Node.js**: Version 22.1+ for TypeScript integration
 - **Framework**: Aptos development environment
 - **Dependencies**: See `Move.toml` for required packages
 
@@ -193,11 +180,11 @@ Integration requires the following contract addresses:
 - **Utility contracts**: Helper contracts for asset handling
 
 ### Code Artifacts and Distribution
-Currently, the DEX-Router-Aptos-V1 is distributed as Move source code:
+Currently, the DEX-Router-Aptos-V1 is distributed as Move source code with TypeScript utilities:
 - **Source Code**: Available in this repository
 - **Contract Deployments**: Deploy contracts to your target networks
-- **No NPM Package**: This is a Move smart contract system
-- **Integration**: Direct smart contract interaction or SDK integration
+- **TypeScript Integration**: Complete test suite and helper utilities for integration
+- **Integration**: Direct smart contract interaction via TypeScript helpers
 
 ### Integration Steps
 1. **Install dependencies**: `npm install`
@@ -214,7 +201,7 @@ cd DEX-Router-Aptos-V1
 # Install node_modules
 npm install
 
-# Install Aptos CLI (if not already installed)
+# Install Aptos CLI v7.7.0 (if not already installed)
 curl -fsSL "https://aptos.dev/scripts/install_cli.py" | python3
 
 # Initialize Aptos account
@@ -223,8 +210,9 @@ aptos init --profile test_account
 # Compile contracts
 aptos move compile --package-dir .
 
-# Run tests
-aptos move test --package-dir .
+# Run TypeScript integration tests
+npx ts-node scripts/tests/singleHop.ts
+npx ts-node scripts/tests/multiHop.ts
 
 # Deploy to testnet
 aptos move publish --package-dir . --profile test_account
