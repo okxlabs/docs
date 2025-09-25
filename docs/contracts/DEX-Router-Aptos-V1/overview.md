@@ -2,7 +2,7 @@
 
 ## What is DEX-Router-Aptos-V1?
 
-DEX-Router-Aptos-V1 is a sophisticated DEX aggregation and routing system built on Aptos that enables optimal token swapping across multiple decentralized exchanges (DEXs) and protocols. It acts as a unified interface for executing complex multi-path swaps, providing users with the best possible rates by splitting orders across different liquidity sources within the Aptos ecosystem.
+DEX-Router-Aptos-V1 is a sophisticated DEX aggregation and routing system built on Aptos that enables optimal token swapping across multiple decentralized exchanges (DEXs) and protocols. It acts as a unified interface for executing complex multi-hop swaps, providing users with the best possible rates by routing through different protocols and liquidity sources within the Aptos ecosystem.
 
 ## Architecture Overview
 
@@ -177,20 +177,18 @@ Integration requires the following contract addresses:
 - **Main Package**: `0x3faf7a406a14b9cdeb842f9caf23826eb19cc78d11997298b7e0115b193be8a1`
 - **Deployer Address**: `0xd2be0d7edad1cb3ecc9bee26bcfc3d595385e9fe309b115ca01e207bc234aefd`
 - **Adapter contracts**: Addresses for each supported DEX
-- **Utility contracts**: Helper contracts for asset handling
+- **DEX Protocol contracts**: Target DEX protocol contracts that adapters interact with
 
 ### Code Artifacts and Distribution
 Currently, the DEX-Router-Aptos-V1 is distributed as Move source code with TypeScript utilities:
 - **Source Code**: Available in this repository
 - **Contract Deployments**: Deploy contracts to your target networks
 - **TypeScript Integration**: Complete test suite and helper utilities for integration
-- **Integration**: Direct smart contract interaction via TypeScript helpers
 
 ### Integration Steps
 1. **Install dependencies**: `npm install`
-2. **Deploy contracts**: Use deployment scripts for contract deployment
-3. **Configure adapters**: Set up adapter contracts for desired DEXs
-4. **Test integration**: Verify swap functionality
+2. **Deploy contracts**: Deploy contracts directly using Aptos CLI commands
+3. **Test integration**: Verify swap functionality
 
 ### Development Setup
 ```bash
