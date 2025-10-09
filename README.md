@@ -1,6 +1,6 @@
 # DEX Router Documentation
 
-This repository provides comprehensive documentation and example smart contracts for DEX Router products, supporting EVM, Solana, and SUI ecosystems.
+This repository provides comprehensive documentation and example smart contracts for DEX Router products, supporting EVM, Solana, SUI, and Aptos ecosystems.
 
 ## Project Structure
 
@@ -8,6 +8,10 @@ This repository provides comprehensive documentation and example smart contracts
 docs/
   docs/
     contracts/
+      DEX-Router-Aptos-V1/
+        guides.md
+        overview.md
+        technical-reference.md
       DEX-Router-EVM-V1/
         guides.md
         overview.md
@@ -35,14 +39,13 @@ docs/
         uniswapV3SwapExactOutTo.sol
         unxswap.sol
         unxswapExactOutTo.sol
-    DEX-Router-Solana-V1/
 ```
 
+- **docs/contracts/DEX-Router-Aptos-V1/**: Documentation for the Aptos version of the DEX Router, including overview, guides, and technical reference.
 - **docs/contracts/DEX-Router-EVM-V1/**: Documentation for the EVM version of the DEX Router, including overview, guides, and technical reference.
 - **docs/contracts/DEX-Router-Solana-V1/**: Documentation for the Solana version of the DEX Router, including overview, guides, and technical reference.
 - **docs/contracts/DEX-Router-Sui-V1/**: Documentation for the SUI version of the DEX Router, including overview, guides, and technical reference.
 - **examples/DEX-Router-EVM-V1/**: Example Solidity contracts and interfaces for the EVM DEX Router.
-- **examples/DEX-Router-Solana-V1/**: (Reserved for Solana contract examples.)
 
 ## Getting Started
 
@@ -51,17 +54,19 @@ docs/
 - [Node.js](https://nodejs.org/) (for documentation tooling, if needed)
 - [Foundry](https://book.getfoundry.sh/) (for Solidity contract development)
 - [Solana CLI](https://docs.solana.com/cli/install-solana-cli-tools) (for Solana development, if needed)
+- [Aptos CLI](https://aptos.dev/tools/aptos-cli-tool/install-aptos-cli/) (for Aptos development, if needed)
+- [SUI CLI](https://docs.sui.io/build/install) (for SUI development, if needed)
 
 ### Usage
 
-- Browse documentation in `docs/docs/contracts/` for EVM, Solana, and SUI routers.
+- Browse documentation in `docs/docs/contracts/` for EVM, Solana, SUI, and Aptos routers.
 - Explore example smart contracts in the `docs/examples/` directory.
 
 ## Contributing
 
 We welcome contributions! Please follow these steps:
 
-1. Pick the appropriate section for your addition (EVM, Solana, or SUI, docs or examples).
+1. Pick the appropriate section for your addition (EVM, Solana, SUI, or Aptos, docs or examples).
 2. Add new documentation under the correct folder:
    - `overview.md` for product overviews
    - `guides.md` for step-by-step guides
