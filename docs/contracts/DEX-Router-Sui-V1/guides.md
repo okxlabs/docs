@@ -44,7 +44,7 @@ import { SUI_CLOCK_OBJECT_ID } from "@mysten/sui.js/utils";
 import * as dotenv from "dotenv";
 
 // Constants (from swap test - Note: Contract addresses may be updated)
-const ROUTER_PACKAGE = "0xafff5502633f670a64328813b66fa08bc7a642ac9c81ed6c4b7ec5448e3b23ad";
+const ROUTER_PACKAGE = "0xfdba5cc063cbe60523712258f28372d4b5b184abc91be6752a7949c4c879fe2a";
 const GLOBAL_CONFIG = "0xdaa46292632c3c4d8f31f23ea0f9b36a28ff3677e9684980e4438403a67a3d8f";
 const POOL = "0xcf994611fd4c48e277ce3ffd4d4364c914af2c3cbb05f7bf6facd371de688630";
 
@@ -468,7 +468,7 @@ const USDC_TYPE = "0x5d4b302506645c37ff133b98c4b50a5ae14841659738d6d733d59d0d217
 const USDT_TYPE = "0xc060006111016b8a020ad5b33834984a437aaa7d3c74c18e09a95d48aceab08c::coin::COIN";
 
 // Core Contract Addresses (Note: These addresses may be updated in future versions)
-const ROUTER_PACKAGE = "0xafff5502633f670a64328813b66fa08bc7a642ac9c81ed6c4b7ec5448e3b23ad";
+const ROUTER_PACKAGE = "0xfdba5cc063cbe60523712258f28372d4b5b184abc91be6752a7949c4c879fe2a";
 const EXTENDED_PACKAGE = "0xab71c2c2c37f973e28b2d28847046615bf47acc85ffc3ba2eb3d9a6442b18422";
 const SUI_CLOCK_OBJECT_ID = "0x6";
 
